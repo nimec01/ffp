@@ -1,23 +1,23 @@
 module Arithmetic where
 
 import Control.Applicative ((<|>))
-import Parsing (Parser, between, chainl1, just, lexed, number, onlyOne, succeed, token)
+import Parsing (Parser, between, chainl1, just, lexed, nat, onlyOne, succeed, token, double)
 
 {-
-  <expr> ::= <term> + <term> | <term>
-  <term> ::= <factor> * <factor> | factor
-  <factor> ::= digit+ | (<expr>)
+  <expr> ::= <term> + <term> | <term> - <term> | <term>
+  <term> ::= <factor> * <factor> | <factor> / <factor> | <factor>
+  <factor> ::= double | (<expr>)
 -}
 
-parseExpression :: Parser Int
-parseExpression = chainl1 parseTerm parsePlus
+parseExpression :: Parser Double
+parseExpression = chainl1 parseTerm parser
   where
-    parsePlus = (+) <$ token '+'
+    parser = (+) <$ token '+' <|> (-) <$ token '-'
 
-parseTerm :: Parser Int
-parseTerm = chainl1 parseFactor parseMul
+parseTerm :: Parser Double
+parseTerm = chainl1 parseFactor parser
   where
-    parseMul = (*) <$ token '*'
+    parser = (*) <$ token '*' <|> (/) <$ token '/'
 
-parseFactor :: Parser Int
-parseFactor = lexed number <|> between (token '(') parseExpression (token ')')
+parseFactor :: Parser Double
+parseFactor = lexed double <|> between (token '(') parseExpression (token ')')

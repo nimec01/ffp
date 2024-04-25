@@ -154,10 +154,22 @@ tokens s = spaces *> string s
 between :: Parser a -> Parser b -> Parser c -> Parser b
 between pStart pBody pEnd = pStart *> pBody <* pEnd
 
--- accepts a number
-number :: Parser Int
-number = read <$> many1 digit
+-- accepts a natural number (including 0)
+nat :: Parser Int
+nat = read <$> many1 digit
+
+int :: Parser Int
+int = (0 -) <$> (char '-' *> nat) <|> nat
+
+double :: Parser Double
+double = do
+  minus <- option $ char '-'
+  pre <- many1 digit
+  char '.'
+  post <- many1 digit
+  return $ (if null minus then 1 else -1) * read (pre ++ "." ++ post)
+  <|> (fromIntegral <$> int)
 
 -- accepts a number of lists enclosed in square brackets separated by ,
 numList :: Parser [Int]
-numList = between (spaces *> char '[') ((spaces *> number) `sepBy` (spaces *> char ',')) (spaces *> char ']')
+numList = between (spaces *> char '[') ((spaces *> nat) `sepBy` (spaces *> char ',')) (spaces *> char ']')

@@ -7,7 +7,7 @@ module ParsingSpec where
 import Control.Applicative (Alternative (many))
 import Data.Char (isDigit, isLetter, toLower)
 import Data.List.Extra (intersperse, notNull, replace)
-import Parsing (Parser (runParser), char, char', digit, epsilon, fail, letter, many1, numList, number, satisfies, sepBy1, space, spaces, string, succeed, token, tokens, notOf, option)
+import Parsing (Parser (runParser), char, char', digit, epsilon, fail, letter, many1, numList, nat, satisfies, sepBy1, space, spaces, string, succeed, token, tokens, notOf, option)
 import Test.Hspec
 import Test.QuickCheck (Gen, choose, elements, forAll, sublistOf, suchThat, vectorOf)
 import Prelude hiding (fail)
@@ -54,7 +54,7 @@ spec = do
         runParser digit s == runParser (fmap id digit) s
     it "Functors preserve composition of morphisms" $
       forAll (randomInput `suchThat` (isDigit . head)) $ \s ->
-        runParser (fmap ((< 10) . (* 3)) number) s == runParser ((fmap (< 10) . fmap (* 3)) number) s
+        runParser (fmap ((< 10) . (* 3)) nat) s == runParser ((fmap (< 10) . fmap (* 3)) nat) s
   describe "Applicative Parser" $ do
     xit "tests" True
   describe "Monad Parser" $ do
@@ -192,18 +192,18 @@ spec = do
            in runParser (token (head s)) s' == [(tail s, head s)]
   describe "between" $ do
     xit "tests" True
-  describe "number" $ do
+  describe "nat" $ do
     it "fails on empty input" $
-      null (runParser number "")
-    it "parses the correct number when input starts with digit(s)" $
+      null (runParser nat "")
+    it "parses the correct nat when input starts with digit(s)" $
       forAll (randomInput `suchThat` (not . isDigit . head)) $ \s ->
         forAll (choose (2, 10000 :: Int)) $ \x ->
           let s' = show x ++ s
               l = length $ show x
-           in runParser number s' == [(drop a s', read (take a s')) | a <- [l, l - 1 .. 1]]
+           in runParser nat s' == [(drop a s', read (take a s')) | a <- [l, l - 1 .. 1]]
   describe "numList" $ do
     it "fails on empty input" $
-      null (runParser number "")
+      null (runParser nat "")
     it "parses the empty list" $
       runParser numList "[]" == [("", [])]
     it "parses the correct list" $

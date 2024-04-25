@@ -2,7 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 module URI where
 import Prelude hiding (any, foldr)
-import Parsing (Parser, string, many1, notOf, number, digit, option, char, any, chainl1, chainl)
+import Parsing (Parser, string, many1, notOf, nat, digit, option, char, any, chainl1, chainl)
 import Control.Applicative ((<|>), Alternative (many))
 import Data.Map (Map, empty, insert, union, toList, mapWithKey, foldrWithKey)
 import qualified Data.Map as Map (null)
@@ -86,7 +86,7 @@ parseURI = do
   string "://"
   credentials' <- option (parseCredentials <* char '@')
   domain <- parseDomain
-  port' <- option $ char ':' *> number
+  port' <- option $ char ':' *> nat
   directory' <- option $ char '/' *> many1 (notOf "?#")
   params' <- option $ char '?' *> parseParams
   hash' <- option $ char '#' *> many1 any
