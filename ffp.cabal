@@ -1,0 +1,56 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           ffp
+version:        0.2.0.0
+build-type:     Simple
+extra-source-files:
+    README.md
+
+library
+  exposed-modules:
+      Parsing
+      SynTree
+      URI
+  other-modules:
+      Arithmetic
+      Paths_ffp
+  hs-source-dirs:
+      src
+  ghc-options: -Wunused-local-binds -Wunused-matches -Wunused-pattern-binds -Wdeprecations -Wempty-enumerations -Widentities -Wname-shadowing -Woverflowed-literals -Woverlapping-patterns -Wtabs
+  build-depends:
+      HUnit
+    , QuickCheck
+    , array
+    , base
+    , containers
+    , extra
+    , hspec
+    , text
+  default-language: Haskell2010
+
+test-suite src-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      ParsingSpec
+      SynTreeSpec
+      URISpec
+      Paths_ffp
+  hs-source-dirs:
+      test
+  ghc-options: -Wunused-local-binds -Wunused-matches -Wunused-pattern-binds -Wdeprecations -Wempty-enumerations -Widentities -Wname-shadowing -Woverflowed-literals -Woverlapping-patterns -Wtabs -threaded -rtsopts -with-rtsopts=-N -Wunused-imports -Wmissing-signatures -Wunused-matches -Widentities -Wunused-top-binds -Werror
+  build-depends:
+      HUnit
+    , QuickCheck
+    , array
+    , base
+    , containers
+    , extra
+    , ffp
+    , hspec
+    , text
+  default-language: Haskell2010

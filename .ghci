@@ -1,0 +1,6 @@
+:def! setPrintHeapDepth \x -> return $ ":def! printHeap \\x -> return $ \"performGC >> GHC.HeapView.buildHeapGraph (" ++ x ++ ") () (GHC.HeapView.asBox (\" ++ x ++ \")) >>= putStrLn . GHC.HeapView.ppHeapGraph\""
+
+:m + System.Mem
+:setPrintHeapDepth 1000
+
+:m + Control.Applicative

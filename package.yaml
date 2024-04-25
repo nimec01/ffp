@@ -1,0 +1,49 @@
+name: ffp
+version: 0.2.0.0
+extra-source-files:
+  - README.md
+build-tools: []
+ghc-options:
+  - -Wunused-local-binds
+  - -Wunused-matches
+  - -Wunused-pattern-binds
+
+  - -Wdeprecations
+  - -Wempty-enumerations
+  - -Widentities
+  - -Wname-shadowing
+  - -Woverflowed-literals
+  - -Woverlapping-patterns
+  - -Wtabs
+dependencies:
+  - HUnit
+  - QuickCheck
+  - array
+  - base
+  - containers
+  - text
+  - hspec
+  - extra
+library:
+  source-dirs: src
+  exposed-modules:
+    - Parsing
+    - SynTree
+    - URI
+
+tests:
+  src-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -Wunused-imports
+      - -Wmissing-signatures
+      - -Wunused-matches
+      - -Widentities
+      - -Wunused-top-binds
+      - -Werror
+    dependencies:
+      - ffp
