@@ -63,19 +63,13 @@ instance Monad Parser where
 
 -- apply p one or more times
 many1 :: Parser a -> Parser [a]
-many1 p = do
-  x <- p
-  xs <- many p
-  return (x : xs)
+many1 p = (:) <$> p <*> many p
 
 sepBy :: Parser a -> Parser b -> Parser [a]
 p `sepBy` s = p `sepBy1` s <|> succeed []
 
 sepBy1 :: Parser a -> Parser b -> Parser [a]
-p `sepBy1` s = do
-  x <- p
-  xs <- many (s *> p)
-  return (x : xs)
+p `sepBy1` s = (:) <$> p <*> many (s *> p)
 
 chainl :: Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainl p op a = p `chainl1` op <|> succeed a
@@ -127,10 +121,7 @@ digit = satisfies isDigit
 -- accepts the specified sequence of characters
 string :: String -> Parser String
 string [] = succeed []
-string (x : xs) = do
-  char x
-  xs' <- string xs
-  return (x : xs')
+string (x:xs) = (x:) <$> (char x *> string xs)
 
 -- accepts every char except the specified
 notOf :: String -> Parser Char
@@ -162,13 +153,12 @@ int :: Parser Int
 int = (0 -) <$> (char '-' *> nat) <|> nat
 
 double :: Parser Double
-double = do
-  minus <- option $ char '-'
-  pre <- many1 digit
-  char '.'
-  post <- many1 digit
-  return $ (if null minus then 1 else -1) * read (pre ++ "." ++ post)
+double =
+  (\m s -> convertSig m * read s)
+    <$> option (char '-') <*> ((\x y -> x++"."++y) <$> many1 digit <*>(char '.' *> many1 digit))
   <|> (fromIntegral <$> int)
+  where convertSig [] = 1
+        convertSig _ = -1
 
 -- accepts a number of lists enclosed in square brackets separated by ,
 numList :: Parser [Int]

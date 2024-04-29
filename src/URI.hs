@@ -61,11 +61,7 @@ parseScheme =
   string "sftp"
 
 parseCredentials :: Parser (String, String)
-parseCredentials = do
-  username <- many1 $ notOf " :@"
-  char ':'
-  password <- many1 $ notOf " :@"
-  return (username, password)
+parseCredentials = (,) <$> many1 (notOf " :@") <*> (char ':' *> many1 (notOf " :@"))
 
 parseDomain :: Parser String
 parseDomain = many1 $ notOf "?#:/"
@@ -73,11 +69,7 @@ parseDomain = many1 $ notOf "?#:/"
 parseParams :: Parser (Map String String)
 parseParams = chainl parseParam (char '&' $> flip union) empty
   where
-    parseParam = do
-      key <- many1 $ notOf "=&#"
-      char '='
-      value <- many1 $ notOf "&#"
-      return $ insert key value empty
+    parseParam = (\k v -> insert k v empty) <$> many1 (notOf "=&#") <*> (char '=' *> many1 (notOf "&#"))
 
 
 parseURI :: Parser URI
