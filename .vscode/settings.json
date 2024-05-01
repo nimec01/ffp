@@ -6,5 +6,5 @@
     "scminput": false,
     "haskell": false
   },
-  "cSpell.words": ["chainl", "fmap", "fmidue", "Functors", "Hspec", "morphisms", "uncons"]
+  "cSpell.words": ["chainl", "fmap", "fmidue", "Functors", "Hspec", "morphisms", "nonterminals", "uncons"]
 }

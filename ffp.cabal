@@ -15,6 +15,7 @@ library
       Parsing
       SynTree
       URI
+      CNF
   other-modules:
       Arithmetic
       Paths_ffp
