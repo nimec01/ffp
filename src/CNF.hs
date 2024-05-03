@@ -2,7 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 module CNF where
 import Data.Map (Map, fromList, empty, insert, union, toList, (!))
-import Parsing (Parser, spaces, satisfies, tokens, many1, sepBy1, lexed, letter, token, char, notOf, space, between, string, choice)
+import Parsing (Parser, spaces, satisfies, tokens, many1, sepBy1, lexed, letter, token, char, notOf, space, between, string, choice, eol)
 import Data.Char (isLetter, isUpper)
 import Control.Applicative ((<|>))
 import Text.Read (Lexeme(Symbol))
@@ -32,7 +32,7 @@ type CNFTree = Tree Symbol
 -}
 
 matchingABGrammar :: String
-matchingABGrammar = "<S> ::= a<S>a | b<S>b | ε ."
+matchingABGrammar = "<S>::=a<S>a|b<S>b|ε."
 
 matchingABs :: CNF
 matchingABs = CNF {
@@ -44,22 +44,23 @@ matchingABs = CNF {
 
 
 parseNonTerminal :: Parser Symbol
-parseNonTerminal = NonTerminal <$> between (char '<') (many1 letter) (char '>')
+parseNonTerminal = NonTerminal <$> between (token '<') (many1 letter) (token '>')
 
 parseTerminal :: Parser Symbol
 parseTerminal =
-  Epsilon <$ (string "EPSILON" <|> string "ε")
+  Epsilon <$ (tokens "EPSILON" <|> tokens "ε")
   <|>
-  Terminal <$> many1 letter
+  Terminal <$> many1 (lexed (satisfies (\x -> isLetter x && x /= 'ε')))
+
 parseReplacement :: Parser [Symbol]
-parseReplacement = space *> many1 (parseNonTerminal <|> parseTerminal) <* space
+parseReplacement = many1 (parseNonTerminal <|> parseTerminal)
 
 parseProductionRule :: Parser (Map Symbol [[Symbol]])
 parseProductionRule = do
   left <- parseNonTerminal
-  string " ::="
-  replacements <- parseReplacement `sepBy1` char '|'
-  char '.'
+  tokens "::="
+  replacements <- parseReplacement `sepBy1` token '|'
+  token '.'
   return $ insert left replacements empty
 
 parseCNF :: Parser CNF
@@ -81,6 +82,7 @@ parseGrammar :: CNF -> Parser (Tree String)
 parseGrammar CNF{..} = parseSym start
   where
     parseSym :: Symbol -> Parser (Tree String)
+    parseSym Epsilon = Node "" [] <$ eol
     parseSym (Terminal t) = Node t [] <$ string t
     parseSym s@(NonTerminal nt) = Node nt <$> parseRule (productions ! s)
     parseRule :: [[Symbol]] -> Parser [Tree String]
@@ -91,11 +93,8 @@ parseGrammar CNF{..} = parseSym start
 
 asThenBs :: CNF
 asThenBs = CNF {
-  nonterminals = [NonTerminal "S",NonTerminal "A"],
-  terminals = [Terminal "a",Terminal "b"],
-  productions = fromList [
-    (NonTerminal "A",[[Terminal "b",NonTerminal "A"],[Terminal "b"]]),
-    (NonTerminal "S",[[Terminal "a",NonTerminal "S"],[Terminal "b"],[Terminal "b",NonTerminal "A"]])
-    ],
+  nonterminals = [NonTerminal "S",NonTerminal "B"],
+  terminals = [Terminal "a",Epsilon,Terminal "b"],
+  productions = fromList [(NonTerminal "B",[[Terminal "b"],[Terminal "b",NonTerminal "B"]]),(NonTerminal "S",[[Terminal "a",NonTerminal "S"],[Terminal "a",NonTerminal "B"]])],
   start = NonTerminal "S"
 }
