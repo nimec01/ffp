@@ -50,7 +50,7 @@ parseTerminal :: Parser Symbol
 parseTerminal =
   Epsilon <$ (tokens "EPSILON" <|> tokens "ε")
   <|>
-  Terminal <$> many1 (lexed (satisfies (\x -> isLetter x && x /= 'ε')))
+  Terminal <$> many1 (lexed (satisfies (\x -> isLetter x && x /= 'ε') (\c -> "unexpected " ++ [c] ++ ", expected a terminal symbol")))
 
 parseReplacement :: Parser [Symbol]
 parseReplacement = many1 (parseNonTerminal <|> parseTerminal)
