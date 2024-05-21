@@ -3,4 +3,4 @@
 :m + System.Mem
 :setPrintHeapDepth 1000
 
-:m + Control.Applicative
+:m + Control.Applicative Text.Megaparsec

@@ -24,13 +24,18 @@ dependencies:
   - text
   - hspec
   - extra
+  - megaparsec
 library:
   source-dirs: src
   exposed-modules:
     - Parsing
     - SynTree
     - URI
-    - CNF
+    - CFG
+    - Megaparsec.SynTree
+    - Megaparsec.URI
+    - Megaparsec.Arithmetic
+    - Megaparsec.CFG
 
 tests:
   src-test:

@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 module Parsing where
 
 import Control.Applicative (Alternative (..))
@@ -86,6 +87,22 @@ p `chainl1` op = do
           rec' (f a b)
       )
         <|> succeed a
+
+chainr :: Parser a -> Parser (a -> a -> a) -> a -> Parser a
+chainr p op a = p `chainr1` op <|> succeed a
+
+chainr1 :: forall a. Parser a -> Parser (a -> a -> a) -> Parser a
+p `chainr1` op = rec'
+  where
+    rec' = do
+      x <- p
+      rec'' x
+    rec'' a =
+      (do
+        f <- op
+        f a <$> rec'
+      ) <|> succeed a
+
 
 lexed :: Parser a -> Parser a
 lexed p = spaces *> p

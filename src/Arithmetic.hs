@@ -4,8 +4,8 @@ import Control.Applicative ((<|>))
 import Parsing (Parser, between, chainl1, just, lexed, nat, onlyOne, succeed, token, double)
 
 {-
-  <expr> ::= <term> + <term> | <term> - <term> | <term>
-  <term> ::= <factor> * <factor> | <factor> / <factor> | <factor>
+  <expr> ::= <expr> + <term> | <expr> - <term> | <term>
+  <term> ::= <term> * <factor> | <term> / <factor> | <factor>
   <factor> ::= double | (<expr>)
 -}
 

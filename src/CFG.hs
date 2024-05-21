@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
-module CNF where
+module CFG where
 import Data.Map (Map, fromList, empty, insert, union, toList, (!))
 import Parsing (Parser, spaces, satisfies, tokens, many1, sepBy1, lexed, letter, token, char, notOf, space, between, string, choice, eol)
 import Data.Char (isLetter, isUpper)
@@ -16,7 +16,7 @@ isTerminal :: Symbol -> Bool
 isTerminal (NonTerminal _) = False
 isTerminal _ = True
 
-data CNF = CNF {
+data CFG = CFG {
   nonterminals :: [Symbol]
 , terminals :: [Symbol]
 , productions :: Map Symbol [[Symbol]]
@@ -25,7 +25,7 @@ data CNF = CNF {
 
 data Tree a = Node a [Tree a] deriving Show
 
-type CNFTree = Tree Symbol
+type CFGTree = Tree Symbol
 
 {-
   S -> aSa | bSb | ε
@@ -34,8 +34,8 @@ type CNFTree = Tree Symbol
 matchingABGrammar :: String
 matchingABGrammar = "<S>::=a<S>a|b<S>b|ε."
 
-matchingABs :: CNF
-matchingABs = CNF {
+matchingABs :: CFG
+matchingABs = CFG {
   nonterminals = [NonTerminal "S"]
 , terminals = [Terminal "a", Terminal "b"]
 , productions = fromList [(NonTerminal "S",[[Terminal "a", NonTerminal "S", Terminal "a"],[Terminal "b", NonTerminal "S", Terminal "b"], []])]
@@ -63,14 +63,14 @@ parseProductionRule = do
   token '.'
   return $ insert left replacements empty
 
-parseCNF :: Parser CNF
-parseCNF = do
+parseCFG :: Parser CFG
+parseCFG = do
   rules <- parseProductionRule `sepBy1` char '\n'
   let productions = foldl union empty rules
   let allSymbols = nubOrd $ M.foldrWithKey (\k v acc -> acc ++ [k] ++ concat v) [] productions
   let nonterminals = filter (not . isTerminal) allSymbols
   let terminals = allSymbols \\ nonterminals
-  return $ CNF {
+  return $ CFG {
     nonterminals,
     terminals,
     productions,
@@ -78,8 +78,8 @@ parseCNF = do
   }
 
 
-parseGrammar :: CNF -> Parser (Tree String)
-parseGrammar CNF{..} = parseSym start
+parseGrammar :: CFG -> Parser (Tree String)
+parseGrammar CFG{..} = parseSym start
   where
     parseSym :: Symbol -> Parser (Tree String)
     parseSym Epsilon = Node "" [] <$ eol
@@ -91,8 +91,8 @@ parseGrammar CNF{..} = parseSym start
     parseReplacement' = mapM parseSym
 
 
-asThenBs :: CNF
-asThenBs = CNF {
+asThenBs :: CFG
+asThenBs = CFG {
   nonterminals = [NonTerminal "S",NonTerminal "B"],
   terminals = [Terminal "a",Epsilon,Terminal "b"],
   productions = fromList [(NonTerminal "B",[[Terminal "b"],[Terminal "b",NonTerminal "B"]]),(NonTerminal "S",[[Terminal "a",NonTerminal "S"],[Terminal "a",NonTerminal "B"]])],
