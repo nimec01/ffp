@@ -16,6 +16,7 @@ library
       SynTree
       URI
       CFG
+      Formula
       Megaparsec.SynTree
       Megaparsec.URI
       Megaparsec.Arithmetic

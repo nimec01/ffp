@@ -1,7 +1,8 @@
 module Arithmetic where
 
 import Control.Applicative ((<|>))
-import Parsing (Parser, between, chainl1, just, lexed, nat, onlyOne, succeed, token, double)
+import Parsing (Parser, between, chainl1, just, lexed, nat, onlyOne, succeed, token, double, satisfies, char)
+import Data.Char (isDigit)
 
 {-
   <expr> ::= <expr> + <term> | <expr> - <term> | <term>
@@ -20,4 +21,10 @@ parseTerm = chainl1 parseFactor parser
     parser = (*) <$ token '*' <|> (/) <$ token '/'
 
 parseFactor :: Parser Double
-parseFactor = lexed double <|> between (token '(') parseExpression (token ')')
+parseFactor = lexed double <|> between (token '(') (token ')') parseExpression
+
+
+parseDigitList :: Parser [Integer]
+parseDigitList = digit' `chainl1` comma
+  where digit' = (\d -> [read [d]]) <$> satisfies isDigit
+        comma = (++) <$ char ','

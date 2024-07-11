@@ -36,11 +36,11 @@ parseTree :: Parser (SynTree Char Char)
 parseTree =
   choice
     [ Leaf <$> lexed letter,
-      Not <$> between (tokens "~(") (lexed parseTree) (token ')'),
+      Not <$> between (tokens "~(") (token ')') (lexed parseTree),
       (\l (o, r) -> Binary o l r)
         <$>
-          between (token '(') (lexed parseTree) (token ')')
-            <*> ((,) <$> lexed letter <*> between (token '(') (lexed parseTree) (token ')'))
+          between (token '(') (token ')') (lexed parseTree)
+            <*> ((,) <$> lexed letter <*> between (token '(') (token ')') (lexed parseTree))
     ]
 
 parsePrettyTree :: Parser (SynTree Char Char)
@@ -48,10 +48,10 @@ parsePrettyTree =
   onlyOne [parseBinary, parseNot, parseLeaf]
   where
     parseLeaf = Leaf <$> lexed letter
-    parseNot = Not <$> (token '~' *> onlyOne [between (token '(') parseBinary (token ')'), parseNot, parseLeaf])
+    parseNot = Not <$> (token '~' *> onlyOne [between (token '(') (token ')') parseBinary, parseNot, parseLeaf])
     parseBinary =
       (\l (o, r) -> Binary o l r)
         <$>
-          onlyOne [between (token '(') parseBinary (token ')'), parseNot, parseLeaf]
+          onlyOne [between (token '(') (token ')') parseBinary, parseNot, parseLeaf]
             <*>
-              ((,) <$> lexed letter <*> onlyOne [between (token '(') parseBinary (token ')'), parseNot, parseLeaf])
+              ((,) <$> lexed letter <*> onlyOne [between (token '(') (token ')') parseBinary, parseNot, parseLeaf])

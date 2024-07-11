@@ -44,7 +44,7 @@ matchingABs = CFG {
 
 
 parseNonTerminal :: Parser Symbol
-parseNonTerminal = NonTerminal <$> between (token '<') (many1 letter) (token '>')
+parseNonTerminal = NonTerminal <$> between (token '<') (token '>') (many1 letter)
 
 parseTerminal :: Parser Symbol
 parseTerminal =
