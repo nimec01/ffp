@@ -1,0 +1,7 @@
+resolver: lts-21.25
+extra-deps:
+  - patch-0.0.8.2
+  - reflex-0.9.3.0
+  - ghc-heap-view-0.6.4.1
+
+allow-newer: true

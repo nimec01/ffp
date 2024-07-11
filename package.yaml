@@ -1,0 +1,27 @@
+name: ffp-paper
+version: 0.2.0.0
+extra-source-files:
+  - README.md
+build-tools: []
+ghc-options:
+  - -Wunused-local-binds
+  - -Wunused-matches
+  - -Wunused-pattern-binds
+
+  - -Wdeprecations
+  - -Wempty-enumerations
+  - -Widentities
+  - -Wname-shadowing
+  - -Woverflowed-literals
+  - -Woverlapping-patterns
+  - -Wtabs
+dependencies:
+  - array
+  - base
+  - containers
+  - text
+  - extra
+library:
+  source-dirs: src
+  exposed-modules:
+    - Main
